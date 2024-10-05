@@ -98,7 +98,9 @@ const App = () => {
         <div className='success-content-verify'>
           {status === "initial" && <h2>FOLLOW STEPS</h2>}
           {status === "error" && (
-            <h2>Code does not exist. Please avoid fake products.</h2>
+            <h2>
+              Code does not exist. Please avoid <br /> fake products.
+            </h2>
           )}
           {status === "success" && <h2>SUCCESS! Your product is verified.</h2>}
 
