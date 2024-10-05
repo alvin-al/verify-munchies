@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 
 const App = () => {
-  const [showError, setShowError] = useState(false);
+  // State untuk 3 kondisi
+  const [status, setStatus] = useState("initial");
   const [inputValue, setInputValue] = useState("");
 
-  // Expected security code - in a real app, this would come from your backend
-  const CORRECT_CODE = 123456;
+  // Kode yang benar
+  const CORRECT_CODE = "123456"; // Tetap string karena input form
 
   const handleSubmit = () => {
-    if (inputValue == CORRECT_CODE) {
-      setShowError(false); // no error, correct code
+    if (inputValue === CORRECT_CODE) {
+      setStatus("success"); // Kode benar
+    } else if (inputValue !== "") {
+      setStatus("error"); // Kode salah
     } else {
-      setShowError(true); // error, incorrect code
+      setStatus("initial"); // Kondisi awal, belum ada input
     }
   };
 
@@ -35,22 +38,19 @@ const App = () => {
             alt=''
           />
         </div>
-        <div className='success-content-verify' id='success-content-verify'>
-          {/* Render different content based on showError state */}
-          {showError ? (
-            <h2>Code does not exist. Please avoid fake products.</h2>
-          ) : (
-            <h2>FOLLOW STEPS</h2>
-          )}
 
-          {!showError ? (
+        <div className='success-content-verify' id='success-content-verify'>
+          {/* Conditional Rendering untuk 3 kondisi */}
+          {status === "initial" && <h2>FOLLOW STEPS</h2>}
+          {status === "error" && (
+            <h2>Code does not exist. Please avoid fake products.</h2>
+          )}
+          {status === "success" && <h2>SUCCESS! Your product is verified.</h2>}
+
+          {/* Jika status masih "initial", tampilkan form */}
+          {status === "initial" && (
             <>
               <div id='qrcode' className='hidden'></div>
-              <h5 className='hidden'></h5>
-              <button type='button' className='scanned-btn hidden'>
-                SCANNED 2 TIMES
-              </button>
-
               <ul className='follow-steps-text'>
                 <li>
                   <span>1</span> <p>Open your camera</p>
@@ -62,24 +62,31 @@ const App = () => {
                   <span>3</span> <p>Results shown</p>
                 </li>
               </ul>
+
               <div className='follow-form'>
-                {/* Input only accepts numbers */}
                 <input
                   type='number'
                   id='security_code'
                   name='security_code'
                   placeholder='Please enter correct security code'
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)} // Handle input change
+                  onChange={(e) => setInputValue(e.target.value)} // Handle perubahan input
                 />
                 <button id='submitButton' onClick={handleSubmit}>
                   SUBMIT
                 </button>
               </div>
             </>
-          ) : (
+          )}
+
+          {/* Jika status bukan "initial", beri pilihan untuk try again */}
+          {status !== "initial" && (
             <div className='click-to-try'>
-              <a href='/' className='text-decoration-none'>
+              <a
+                href='/'
+                onClick={() => setStatus("initial")}
+                className='text-decoration-none'
+              >
                 <h4>CLICK TO TRY AGAIN</h4>
               </a>
             </div>
