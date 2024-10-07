@@ -35,15 +35,18 @@ const VerifyCodeSlug = ({ code }) => {
       if (result.success) {
         setStatus("success");
         setInputValue("");
-
-        // Redirect to /verify without the code in the URL
+        // Redirect to /verify
         window.history.replaceState(null, '', '/verify');
       } else {
         setStatus("error");
+        // Redirect to /verify
+        window.history.replaceState(null, '', '/verify');
       }
     } catch (error) {
       console.error("Error during verification:", error);
       setStatus("error");
+      // Redirect to /verify
+      window.history.replaceState(null, '', '/verify');
     } finally {
       setLoading(false);
     }
