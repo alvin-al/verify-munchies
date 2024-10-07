@@ -35,6 +35,9 @@ const VerifyCodeSlug = ({ code }) => {
       if (result.success) {
         setStatus("success");
         setInputValue("");
+
+        // Redirect to /verify without the code in the URL
+        window.history.replaceState(null, '', '/verify');
       } else {
         setStatus("error");
       }
