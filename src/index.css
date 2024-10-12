@@ -201,6 +201,36 @@ body {
     margin-top: 20px;
   }
 }
+.already {
+  margin: auto;
+  width: 100%; /* Biar full width pada layar kecil */
+  max-width: 500px; /* Maksimal lebar tetap 500px */
+  height: 56px;
+  line-height: 56px;
+  background: #fbef2f;
+  color: #f04158;
+  font-size: 24px;
+  font-family: "Roboto", sans-serif;
+  top: 0;
+  right: 0;
+  border: 0;
+  border-radius: 50px;
+  padding: 0;
+  text-decoration: none;
+  font-weight: 700;
+  transition: 0.45s;
+}
+
+.already-text {
+  text-align: center;
+  padding-left: 5%; /* Lebih kecil padding untuk layar kecil */
+  padding-right: 5%;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  font-size: 1.5rem; /* Gunakan vw agar font-size responsif */
+  color: #fff;
+  font-weight: 600;
+}
 .success-content-verify {
   padding-top: 60px;
   text-align: center;

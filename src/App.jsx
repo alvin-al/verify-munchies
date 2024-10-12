@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 
 const App = () => {
   const [status, setStatus] = useState("initial");
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submissionCount, setSubmissionCount] = useState(0);
 
   const handleSubmit = async () => {
     if (inputValue.trim() === "") {
@@ -28,10 +29,20 @@ const App = () => {
       }
 
       const result = await response.json();
-      console.log("Server response:", result); // Debug log
+      console.log("Server response:", result);
 
       if (result.success) {
-        setStatus("success");
+        // Retrieve the submission count after a successful submit
+        const count = sessionStorage.getItem(inputValue) || 0;
+        const newCount = Number(count) + 1;
+        sessionStorage.setItem(inputValue, newCount);
+        setSubmissionCount(newCount);
+
+        if (newCount > 2) {
+          setStatus("inauthentic");
+        } else {
+          setStatus("success");
+        }
         setInputValue("");
       } else {
         setStatus("error");
@@ -45,27 +56,22 @@ const App = () => {
   };
 
   const handleTryAgain = (e) => {
-    e.preventDefault(); // Prevent default link behavior
+    e.preventDefault();
     setInputValue("");
     setStatus("initial");
   };
 
-  // Loading component
-  // if (loading) {
-  //   return (
-
-  //   );
-  // }
+  console.log(submissionCount);
 
   return (
     <div className='main-verify-bg-sec'>
-      {loading ? (
+      {loading && (
         <div className='loading-style'>
           <div className=''>
             <img src='https://munchiesfactory.com/cdn/shop/t/26/assets/ajax-loader.gif' />
           </div>
         </div>
-      ) : null}
+      )}
       <div className='container'>
         <div className='verify-logo-center'>
           <a href='/'>
@@ -77,7 +83,7 @@ const App = () => {
           </a>
         </div>
 
-        {status === "error" ? (
+        {status === "error" || status === "inauthentic" ? (
           <div className='error-cloose'>
             <img
               src='https://cdn.shopify.com/s/files/1/0594/2833/9878/files/clossse.png?v=1707924722'
@@ -103,6 +109,18 @@ const App = () => {
             </h2>
           )}
           {status === "success" && <h2>SUCCESS! Your product is verified.</h2>}
+          {status === "inauthentic" && (
+            <div>
+              <h2>POSSIBLY INAUTHENTIC</h2>
+              <p className='already-text'>
+                THIS PRODUCT IS VERIFIED AUTHENTIC. BE AWARE, IF THE CODE IS
+                SCANNED MORE THAN TWICE, IT WILL SHOW AS POSSIBLY INAUTHENTIC.
+              </p>
+              <div className='already'>
+                <p>ALREADY SCANNED {submissionCount}</p>
+              </div>
+            </div>
+          )}
 
           {status === "initial" && (
             <>
@@ -139,17 +157,18 @@ const App = () => {
             </>
           )}
 
-          {status !== "initial" && (
-            <div className='click-to-try'>
-              <a
-                href='#'
-                onClick={handleTryAgain}
-                className='text-decoration-none'
-              >
-                <h4>CLICK TO TRY AGAIN</h4>
-              </a>
-            </div>
-          )}
+          {status == "initial" ||
+            (status !== "inauthentic" && (
+              <div className='click-to-try'>
+                <a
+                  href='#'
+                  onClick={handleTryAgain}
+                  className='text-decoration-none'
+                >
+                  <h4>CLICK TO TRY AGAIN</h4>
+                </a>
+              </div>
+            ))}
         </div>
       </div>
     </div>
