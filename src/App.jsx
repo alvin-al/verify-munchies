@@ -168,7 +168,7 @@ const App = () => {
 
               <div className='follow-form'>
                 <input
-                  type='number'
+                  type='text'
                   id='security_code'
                   name='security_code'
                   placeholder='Please enter correct security code'
