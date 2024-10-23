@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.css";
+import { useParams, useNavigate } from "react-router-dom";
 
 const App = () => {
   const [status, setStatus] = useState("initial");
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
-  const [submissionCount, setSubmissionCount] = useState(0); // Keep it for displaying purpose
+  const [submissionCount, setSubmissionCount] = useState(0);
+  const { code } = useParams();
+  const hasSubmitted = useRef(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async () => {
-    if (inputValue.trim() === "") {
+  const handleSubmit = async (codeToSubmit) => {
+    if (!codeToSubmit || codeToSubmit.trim() === "") {
       setStatus("initial");
       return;
     }
@@ -21,7 +25,7 @@ const App = () => {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: JSON.stringify({ code: inputValue }),
+        body: JSON.stringify({ code: codeToSubmit }),
       });
 
       if (!response.ok) {
@@ -29,10 +33,7 @@ const App = () => {
       }
 
       const result = await response.json();
-      console.log("Server response:", result);
-
       if (result.success) {
-        // Assume server returns 'scanCount' in response
         const newCount = result.scanCount || 0;
         setSubmissionCount(newCount);
 
@@ -41,22 +42,51 @@ const App = () => {
         } else {
           setStatus("success");
         }
-        setInputValue("");
+        setInputValue(""); // Reset input setelah submit
+
+        // Clean up URL after successful submission, but only if we came from a direct code URL
+        if (code) {
+          // Use replaceState to update URL without navigation
+          window.history.replaceState(null, "", "/verify");
+        }
       } else {
         setStatus("error");
+        if (code) {
+          window.history.replaceState(null, "", "/verify");
+        }
       }
     } catch (error) {
       console.error("Error during verification:", error);
       setStatus("error");
+      if (code) {
+        window.history.replaceState(null, "", "/verify");
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (code && !hasSubmitted.current) {
+      hasSubmitted.current = true;
+      setInputValue(code);
+      handleSubmit(code);
+    }
+  }, [code]); // Removed navigate from dependencies
+
+  const handleManualSubmit = () => {
+    handleSubmit(inputValue);
   };
 
   const handleTryAgain = (e) => {
     e.preventDefault();
     setInputValue("");
     setStatus("initial");
+    hasSubmitted.current = false;
+    // Update URL without causing a refresh
+    if (code) {
+      window.history.replaceState(null, "", "/verify");
+    }
   };
 
   return (
@@ -64,7 +94,10 @@ const App = () => {
       {loading && (
         <div className='loading-style'>
           <div className=''>
-            <img src='https://munchiesfactory.com/cdn/shop/t/26/assets/ajax-loader.gif' />
+            <img
+              src='https://munchiesfactory.com/cdn/shop/t/26/assets/ajax-loader.gif'
+              alt='Loading'
+            />
           </div>
         </div>
       )}
@@ -144,7 +177,7 @@ const App = () => {
                 />
                 <button
                   id='submitButton'
-                  onClick={handleSubmit}
+                  onClick={handleManualSubmit}
                   disabled={loading}
                 >
                   SUBMIT
