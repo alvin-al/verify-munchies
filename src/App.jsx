@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 
 const App = () => {
   const [status, setStatus] = useState("initial");
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
-  const [submissionCount, setSubmissionCount] = useState(0);
+  const [submissionCount, setSubmissionCount] = useState(0); // Keep it for displaying purpose
 
   const handleSubmit = async () => {
     if (inputValue.trim() === "") {
@@ -32,10 +32,8 @@ const App = () => {
       console.log("Server response:", result);
 
       if (result.success) {
-        // Retrieve the submission count after a successful submit
-        const count = sessionStorage.getItem(inputValue) || 0;
-        const newCount = Number(count) + 1;
-        sessionStorage.setItem(inputValue, newCount);
+        // Assume server returns 'scanCount' in response
+        const newCount = result.scanCount || 0;
         setSubmissionCount(newCount);
 
         if (newCount > 2) {
@@ -60,8 +58,6 @@ const App = () => {
     setInputValue("");
     setStatus("initial");
   };
-
-  console.log(submissionCount);
 
   return (
     <div className='main-verify-bg-sec'>
@@ -157,7 +153,7 @@ const App = () => {
             </>
           )}
 
-          {status == "initial" ||
+          {status === "initial" ||
             (status !== "inauthentic" && (
               <div className='click-to-try'>
                 <a
